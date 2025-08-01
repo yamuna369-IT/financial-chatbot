@@ -31,10 +31,12 @@ project/
 
 │
 ├── templates/
+
 │ └── index.html # Chat UI
 
 │
 ├── static/
+
 │ └── style.css # CSS styles (chat bubble style)
 
 │
