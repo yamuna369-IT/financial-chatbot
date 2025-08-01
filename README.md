@@ -20,16 +20,23 @@ A GenAI-powered chatbot that extracts and analyzes financial data such as **reve
 project/
 │
 ├── app.py # Flask backend
+
 ├── chatbot_engine.py # Core chatbot logic
+
 ├── data_parser.py # XML data extraction
+
 ├── data/ # XML filings (Apple, Microsoft, Tesla)
+
 │ └── aapl-20240629_htm.xml # Example file
+
 │
 ├── templates/
 │ └── index.html # Chat UI
+
 │
 ├── static/
 │ └── style.css # CSS styles (chat bubble style)
+
 │
 └── README.md
 
