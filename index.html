@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BCG Financial Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        #chatbox { height: 400px; border: 1px solid #ddd; padding: 10px; overflow-y: auto; margin-bottom: 10px; }
+        .user { color: #0066cc; margin: 5px 0; }
+        .bot { color: #009933; margin: 5px 0; }
+        #input-box { width: 70%; padding: 8px; }
+        button { padding: 8px 15px; background: #0066cc; color: white; border: none; }
+    </style>
+</head>
+<body>
+    <h1>BCG Financial Data Assistant</h1>
+    <div id="chatbox"></div>
+    <input type="text" id="input-box" placeholder="Ask about Microsoft's 2024 revenue...">
+    <button onclick="sendQuestion()">Ask</button>
+    <div id="chat-container">
+    <!-- messages will appear here -->
+</div>
+
+<div id="user-input">
+    <input type="text" id="message" placeholder="Type your message..." />
+    <button onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+function addMessage(message, sender = "bot") {
+    const container = document.getElementById("chat-container");
+    const msgDiv = document.createElement("div");
+    msgDiv.className = "message " + (sender === "user" ? "user-message" : "bot-message");
+
+    // check for chart placeholder
+    if (message.includes("data:image/png;base64,")) {
+        const img = document.createElement("img");
+        img.src = message;
+        img.className = "chart";
+        msgDiv.appendChild(img);
+    } else {
+        msgDiv.innerText = message;
+    }
+
+    container.appendChild(msgDiv);
+    container.scrollTop = container.scrollHeight;
+}
+
+function sendMessage() {
+    const input = document.getElementById("message");
+    const text = input.value;
+    if (!text.trim()) return;
+
+    addMessage(text, "user");
+    input.value = "";
+
+    fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.type === "chart") {
+            addMessage(data.data, "bot");
+        } else {
+            addMessage(data.data, "bot");
+        }
+    });
+}
+</script>
+
+
+    <script>
+        function sendQuestion() {
+            const input = document.getElementById("input-box");
+            const question = input.value.trim();
+            if (!question) return;
+
+            // Add user question
+            document.getElementById("chatbox").innerHTML += 
+                `<div class="user"><strong>You:</strong> ${question}</div>`;
+            input.value = "";
+
+            // Get bot response
+            fetch("/ask", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ question })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("chatbox").innerHTML += 
+                    `<div class="bot"><strong>Bot:</strong> ${data.response}</div>`;
+                // Auto-scroll
+                document.getElementById("chatbox").scrollTop = 
+                    document.getElementById("chatbox").scrollHeight;
+            });
+        }
+
+        // Handle Enter key
+        document.getElementById("input-box").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                sendQuestion();
+            }
+        });
+    </script>
+</body>
+</html>
